@@ -777,7 +777,7 @@
                 id: 5, 
                 title: "Sony WH-1000XM5 Сымсыз Құлаққаптары", 
                 price: 185000, 
-                img: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=800&q=80",
+                img: "https://images.pexels.com/photos/3587478/pexels-photo-3587478.jpeg?auto=compress&cs=tinysrgb&w=800",
                 category: "headphones",
                 desc: "Әлемдегі ең үздік белсенді шуды басу (ANC) технологиясы бар сымсыз премиум құлаққаптар. Таза дыбыс, LDAC қолдауы, 30 сағаттық жұмыс уақыты және микрофонның ерекше сапасы."
             },
@@ -785,7 +785,7 @@
                 id: 6, 
                 title: "HyperX Cloud III Сымсыз Ойын Гарнитурасы", 
                 price: 74000, 
-                img: "https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?auto=format&fit=crop&w=800&q=80",
+                img: "https://images.pexels.com/photos/5690129/pexels-photo-5690129.jpeg?auto=compress&cs=tinysrgb&w=800",
                 category: "headphones",
                 desc: "Ұзақ ойын сессияларына арналған аса жайлы құлаққаптар. Дыбыстың айқын деңгейі, берік алюминий жақтауы, 120 сағатқа жететін алып батарея сыйымдылығы."
             },
@@ -793,7 +793,7 @@
                 id: 7, 
                 title: "Samsung Odyssey G7 27\" Curved Мониторы", 
                 price: 210000, 
-                img: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80",
+                img: "https://images.pexels.com/photos/1779487/pexels-photo-1779487.jpeg?auto=compress&cs=tinysrgb&w=800",
                 category: "accessories",
                 desc: "240Hz экран жиілігі, 1ms жауап беру уақыты, QLED технологиясы және 1000R майысу радиусы бар кәсіби ойын және жұмыс мониторы. Терең бейне сапасы үшін тамаша таңдау."
             },
@@ -801,7 +801,7 @@
                 id: 8, 
                 title: "Apple AirPods Pro 2", 
                 price: 125000, 
-                img: "https://images.unsplash.com/photo-1588449668338-d15168b5a4c5?auto=format&fit=crop&w=800&q=80",
+                img: "https://images.pexels.com/photos/3825517/pexels-photo-3825517.jpeg?auto=compress&cs=tinysrgb&w=800",
                 category: "headphones",
                 desc: "Жетілдірілген H2 чипі, 2 есе тиімді белсенді шуды басу жүйесі және дыбысты айналадан тарататын адаптивті аудио мүмкіндігі бар Apple-дің ең танымал құлаққабы."
             },
@@ -809,7 +809,7 @@
                 id: 9, 
                 title: "Razer DeathAdder V3 Pro", 
                 price: 69000, 
-                img: "https://images.unsplash.com/photo-1625890210171-6dd599103716?auto=format&fit=crop&w=800&q=80",
+                img: "https://images.pexels.com/photos/8533221/pexels-photo-8533221.jpeg?auto=compress&cs=tinysrgb&w=800",
                 category: "mice",
                 desc: "Небәрі 63 грамм салмақпен киберспорт әлемін бағындырған эргономикалық сымсыз тінтуір. Focus Pro 30K оптикалық сенсоры мен свитчтерінің максималды дәлдігі."
             },
@@ -817,14 +817,33 @@
                 id: 10, 
                 title: "Elgato Stream Deck MK.2", 
                 price: 85000, 
-                img: "https://images.unsplash.com/photo-1598550476439-6847785fce6e?auto=format&fit=crop&w=800&q=80",
+                img: "https://images.pexels.com/photos/163185/pexels-photo-163185.jpeg?auto=compress&cs=tinysrgb&w=800",
                 category: "accessories",
-                desc: "Стримерлер мен кәсіби мамандарға арналған 15 интерактивті LCD батырмасы бар басқару пульті. Бір басу арқылы қолданбаларды іске қосуға және әрекеттерді жеңілдетуге болады."
+                desc: "Стримерлер мен кәсіби мамандарға арналған 15 интерактивті LCD батырмасы бар басқару пульті. Бір басу арқылы қолданбаларды іске қосуға ие болуға және әрекеттерді жеңілдетуге болады."
             }
         ];
 
         // БРАУЗЕРДЕГІ ДЕРЕКТЕРДІ ІСКЕ ҚОСУ
-        let products = JSON.parse(localStorage.getItem('shop_products_kz')) || defaultProducts;
+        let storedProducts = localStorage.getItem('shop_products_kz');
+        let products = defaultProducts;
+
+        if (storedProducts) {
+            try {
+                const parsed = JSON.parse(storedProducts);
+                const hasUnsplash = parsed.some(p => p.img && p.img.includes('unsplash.com'));
+                if (hasUnsplash) {
+                    localStorage.setItem('shop_products_kz', JSON.stringify(defaultProducts));
+                    products = defaultProducts;
+                } else {
+                    products = parsed;
+                }
+            } catch (e) {
+                products = defaultProducts;
+            }
+        } else {
+            localStorage.setItem('shop_products_kz', JSON.stringify(defaultProducts));
+        }
+
         let cart = JSON.parse(localStorage.getItem('shop_cart_kz')) || [];
         let orders = JSON.parse(localStorage.getItem('shop_orders_kz')) || [];
 
