@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="kk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ TECH_SHOP - Озық Гаджеттер & Девайстар Дүкені</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS v4 via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #080B11;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Glassmorphism utilities */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.35);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            background: rgba(30, 41, 59, 0.55);
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.2), 0 8px 10px -6px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080B11;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1F2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4F46E5;
+        }
+
+        /* Toast slide-in animation */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%) translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-item {
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+
+<body class="text-slate-200 min-h-screen flex flex-col antialiased">
+
+    <!-- Жоғарғы Навигация (Header) -->
+    <header class="glass-panel sticky top-0 z-40 border-b border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex justify-between items-center">
+            <!-- Логотип -->
+            <a href="#" onclick="showPage('shop')" class="flex items-center space-x-2 group">
+                <span class="text-3xl bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400 bg-clip-text text-transparent font-black tracking-wider transition duration-300 group-hover:scale-105">⚡ TECH_SHOP</span>
+            </a>
+
+            <!-- Бағыттау батырмалары -->
+            <div class="flex items-center space-x-3 sm:space-x-6">
+                <button onclick="showPage('shop')" id="nav-btn-shop"
+                    class="px-4 py-2 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 hover:text-white cursor-pointer active-nav">
+                    Дүкен
+                </button>
+                <button onclick="showPage('admin')" id="nav-btn-admin"
+                    class="px-4 py-2 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 border border-slate-800 hover:border-indigo-500/50 hover:bg-indigo-500/10 cursor-pointer">
+                    Админ-Панель
+                </button>
+                
+                <!-- Себет батырмасы -->
+                <button onclick="toggleCart(true)" class="relative p-2.5 rounded-xl border border-slate-800 bg-slate-900/50 hover:bg-slate-900 hover:border-cyan-500/50 transition cursor-pointer group" title="Себетті ашу">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-300 group-hover:text-cyan-400 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span id="cart-counter" class="absolute -top-1.5 -right-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-[10px] font-bold w-5.5 h-5.5 rounded-full flex items-center justify-center border border-[#080B11] shadow-[0_0_10px_rgba(99,102,241,0.5)]">
+                        0
+                    </span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ТЕЗ ХАБАРЛАМАЛАР КӨРСЕТКІШІ (Toast System container) -->
+    <div id="toast-container" class="fixed top-24 right-4 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- 1-БЕТ: ДҮКЕН ВИТРИНАСЫ (SHOP PAGE) -->
+    <main id="shop-page" class="page active flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <!-- Геро-баннер -->
+        <div class="relative overflow-hidden rounded-3xl mb-12 bg-gradient-to-br from-slate-950 via-slate-900 to-[#12102E] border border-slate-800 p-8 md:p-14 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="absolute -right-24 -top-24 w-80 h-80 rounded-full bg-indigo-600/10 blur-[100px] pointer-events-none"></div>
+            <div class="absolute -left-24 -bottom-24 w-80 h-80 rounded-full bg-cyan-500/10 blur-[100px] pointer-events-none"></div>
+            
+            <div class="max-w-2xl text-center md:text-left z-10">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-violet-500/10 text-violet-400 border border-violet-500/20 mb-4 tracking-wider uppercase">
+                    🚀 Жаңа мүмкіндіктер заманы
+                </span>
+                <h1 class="text-3xl md:text-6xl font-extrabold text-white leading-tight mb-4 tracking-tight">
+                    Болашақ технологиясы <br>
+                    <span class="bg-gradient-to-r from-violet-400 via-indigo-400 to-cyan-300 bg-clip-text text-transparent">бүгін сіздің қолыңызда</span>
+                </h1>
+                <p class="text-slate-400 text-base md:text-lg mb-8 max-w-lg">
+                    Ең озық девайстар мен гаджеттерді ең қолайлы бағада табыңыз. Тікелей жеткізу, кепілдік және Kaspi-мен бөліп төлеу қарастырылған.
+                </p>
+                <div class="flex flex-wrap justify-center md:justify-start gap-4 text-xs font-medium text-slate-400">
+                    <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Қазақстан бойынша тегін жеткізу</span>
+                    <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> 12 ай ресми кепілдік</span>
+                    <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span> Бөліп төлеу 0-0-12</span>
+                </div>
+            </div>
+            <div class="relative hidden lg:block w-96 h-64 z-10">
+                <!-- Premium glass vector dynamic design display -->
+                <div class="absolute inset-0 bg-gradient-to-tr from-violet-600/20 to-cyan-500/20 rounded-2xl border border-white/5 backdrop-blur-3xl transform rotate-3 scale-105 shadow-2xl"></div>
+                <div class="absolute inset-0 bg-[#0F172A]/80 rounded-2xl border border-slate-800 p-6 flex flex-col justify-between shadow-2xl transform -rotate-1">
+                    <div class="flex justify-between items-start">
+                        <div class="space-y-1">
+                            <span class="text-xs font-bold text-violet-400 tracking-widest uppercase">Жазғы Жеңілдіктер</span>
+                            <h3 class="text-xl font-bold text-white">Apple AirPods Pro 2</h3>
+                        </div>
+                        <span class="bg-cyan-500/20 text-cyan-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-cyan-500/30">-15%</span>
+                    </div>
+                    <div class="flex justify-between items-end mt-8">
+                        <div>
+                            <span class="text-[10px] text-slate-500 block">Бағасы:</span>
+                            <span class="text-2xl font-black text-white">125 000 ₸</span>
+                        </div>
+                        <button onclick="addToCart(9)" class="px-4 py-2 text-xs font-bold bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-lg hover:from-violet-500 hover:to-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.4)] transition cursor-pointer">
+                            Себетке қосу
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сүзгілер және іздеу жүйесі -->
+        <div class="glass-panel rounded-2xl p-6 mb-8 border border-slate-800/80 shadow-lg">
+            <div class="flex flex-col lg:flex-row gap-6 justify-between items-center">
+                <!-- Іздеу сөзі -->
+                <div class="relative w-full lg:w-96">
+                    <input type="text" id="search-input" oninput="applyFilters()" placeholder="Тауар атауы немесе сипаттамасымен іздеу..." 
+                        class="w-full pl-11 pr-4 py-3 bg-slate-900/60 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm text-slate-200 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-500 absolute left-3.5 top-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+
+                <!-- Санат сүзгілері -->
+                <div class="flex flex-wrap justify-center gap-2 w-full lg:w-auto">
+                    <button onclick="setCategory('all')" id="cat-btn-all" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold transition border border-slate-800 hover:border-slate-700 bg-slate-900/40 text-slate-300 cursor-pointer active-cat">
+                        Барлығы
+                    </button>
+                    <button onclick="setCategory('laptops')" id="cat-btn-laptops" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold transition border border-slate-800 hover:border-slate-700 bg-slate-900/40 text-slate-300 cursor-pointer">
+                        Ноутбуктер
+                    </button>
+                    <button onclick="setCategory('keyboards')" id="cat-btn-keyboards" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold transition border border-slate-800 hover:border-slate-700 bg-slate-900/40 text-slate-300 cursor-pointer">
+                        Пернетақталар
+                    </button>
+                    <button onclick="setCategory('mice')" id="cat-btn-mice" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold transition border border-slate-800 hover:border-slate-700 bg-slate-900/40 text-slate-300 cursor-pointer">
+                        Тінтуірлер
+                    </button>
+                    <button onclick="setCategory('headphones')" id="cat-btn-headphones" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold transition border border-slate-800 hover:border-slate-700 bg-slate-900/40 text-slate-300 cursor-pointer">
+                        Құлаққаптар
+                    </button>
+                    <button onclick="setCategory('accessories')" id="cat-btn-accessories" class="cat-btn px-4 py-2 rounded-xl text-xs font-semibold transition border border-slate-800 hover:border-slate-700 bg-slate-900/40 text-slate-300 cursor-pointer">
+                        Аксессуарлар
+                    </button>
+                </div>
+
+                <!-- Сұрыптау -->
+                <div class="relative w-full lg:w-48">
+                    <select id="sort-select" onchange="applyFilters()" class="w-full px-4 py-3 bg-slate-900/60 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-300 transition cursor-pointer">
+                        <option value="default">Сұрыптау (Әдепкі)</option>
+                        <option value="price-asc">Бағасы: Өсуімен</option>
+                        <option value="price-desc">Бағасы: Кемуімен</option>
+                        <option value="name-asc">Атауы бойынша (А-Я)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Тауарлар каталогының торы -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+                <span class="w-2.5 h-6 bg-indigo-600 rounded-full inline-block"></span>
+                Тауарлар каталогы
+            </h2>
+            <span id="results-count" class="text-xs font-medium text-slate-400 bg-slate-900/60 border border-slate-800 px-3 py-1.5 rounded-full">
+                Тауар саны: 10
+            </span>
+        </div>
+        
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Тауарлар JavaScript арқылы динамикалық түрде осы жерге шығады -->
+        </div>
+    </main>
+
+    <!-- 2-БЕТ: АДМИН-ПАНЕЛЬ (ADMIN DASHBOARD) -->
+    <main id="admin-page" class="page flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <!-- Dashboard Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-slate-800 pb-6">
+            <div>
+                <h1 class="text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                    🛡️ Басқару және Әкімшілік Панелі
+                </h1>
+                <p class="text-slate-400 text-sm mt-1">Тауарларды редакциялау, аналитиканы бақылау және тұтынушы тапсырыстарын өңдеу орталығы.</p>
+            </div>
+            <!-- Администратор белгішесі -->
+            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Басқару Режимі Белсенді
+            </span>
+        </div>
+
+        <!-- Аналитикалық Көрсеткіштер (Analytics Stats Cards) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <!-- 1. Жалпы Сату Кірісі -->
+            <div class="glass-panel p-6 rounded-2xl border border-slate-800/80 shadow-md relative overflow-hidden flex flex-col justify-between h-32">
+                <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-emerald-500/5 blur-2xl pointer-events-none"></div>
+                <div class="flex justify-between items-start">
+                    <span class="text-slate-400 text-xs font-bold tracking-wider uppercase">Жалпы Табыс</span>
+                    <span class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </span>
+                </div>
+                <div>
+                    <h3 id="stat-revenue" class="text-2xl font-black text-white">0 ₸</h3>
+                    <p class="text-emerald-400 text-[10px] mt-1 font-medium">Аяқталған тапсырыстардан</p>
+                </div>
+            </div>
+
+            <!-- 2. Тапсырыстар Саны -->
+            <div class="glass-panel p-6 rounded-2xl border border-slate-800/80 shadow-md relative overflow-hidden flex flex-col justify-between h-32">
+                <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-indigo-500/5 blur-2xl pointer-events-none"></div>
+                <div class="flex justify-between items-start">
+                    <span class="text-slate-400 text-xs font-bold tracking-wider uppercase">Тапсырыс саны</span>
+                    <span class="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                    </span>
+                </div>
+                <div>
+                    <h3 id="stat-orders" class="text-2xl font-black text-white">0</h3>
+                    <p class="text-slate-400 text-[10px] mt-1 font-medium">Барлық тіркелген сұраныстар</p>
+                </div>
+            </div>
+
+            <!-- 3. Тауарлар Саны -->
+            <div class="glass-panel p-6 rounded-2xl border border-slate-800/80 shadow-md relative overflow-hidden flex flex-col justify-between h-32">
+                <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-violet-500/5 blur-2xl pointer-events-none"></div>
+                <div class="flex justify-between items-start">
+                    <span class="text-slate-400 text-xs font-bold tracking-wider uppercase">Тауар ассортименті</span>
+                    <span class="p-1.5 rounded-lg bg-violet-500/10 text-violet-400 text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </span>
+                </div>
+                <div>
+                    <h3 id="stat-products" class="text-2xl font-black text-white">0</h3>
+                    <p class="text-slate-400 text-[10px] mt-1 font-medium">Белсенді сатылымдағы тауарлар</p>
+                </div>
+            </div>
+
+            <!-- 4. Танымалдылық рейтингі -->
+            <div class="glass-panel p-6 rounded-2xl border border-slate-800/80 shadow-md relative overflow-hidden flex flex-col justify-between h-32">
+                <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-cyan-500/5 blur-2xl pointer-events-none"></div>
+                <div class="flex justify-between items-start">
+                    <span class="text-slate-400 text-xs font-bold tracking-wider uppercase">Жүйелік Күйі</span>
+                    <span class="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                    </span>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-black text-white">БҰЛТТЫ</h3>
+                    <p class="text-cyan-400 text-[10px] mt-1 font-medium">Local DB Синхрондаулы</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ішкі Навигация: Тапсырыстар Және Тауарлар Санаттары (Admin inner tabs) -->
+        <div class="flex border-b border-slate-800 mb-8 gap-4">
+            <button onclick="setAdminTab('orders')" id="admin-tab-orders" class="admin-tab-btn pb-3 px-2 font-bold text-sm tracking-wide transition border-b-2 border-indigo-600 text-white cursor-pointer">
+                📦 Тапсырыстар Кестесі
+            </button>
+            <button onclick="setAdminTab('products')" id="admin-tab-products" class="admin-tab-btn pb-3 px-2 font-bold text-sm tracking-wide transition border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer">
+                🏷️ Тауарларды Басқару
+            </button>
+        </div>
+
+        <!-- АДМИН-ТАБ 1: ТАПСЫРЫСТАРДЫ БАСҚАРУ -->
+        <div id="admin-orders-content" class="admin-tab-content">
+            <div class="glass-panel p-6 rounded-2xl border border-slate-800/80 shadow-lg">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Тұтынушылар Сұраныстары
+                    </h3>
+                    <button onclick="clearAllOrders()" class="px-3 py-1.5 text-xs font-semibold border border-red-500/30 text-red-400 bg-red-500/10 hover:bg-red-500/20 rounded-lg cursor-pointer transition">
+                        Тізімді Толық Тазалау
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold tracking-wider uppercase">
+                                <th class="pb-3 px-4">Клиент</th>
+                                <th class="pb-3 px-4">Қала / Мекенжай</th>
+                                <th class="pb-3 px-4">Тауарлар</th>
+                                <th class="pb-3 px-4">Жалпы сома</th>
+                                <th class="pb-3 px-4">Төлем әдісі</th>
+                                <th class="pb-3 px-4 text-center">Күйі</th>
+                                <th class="pb-3 px-4 text-right">Әрекет</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-orders-table" class="divide-y divide-slate-800/60">
+                            <!-- Тапсырыстар тізімі JS арқылы жүктеледі -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Егер тапсырыс жоқ болса көрсетілетін блок -->
+                <div id="empty-orders-view" class="hidden flex flex-col items-center justify-center py-12 text-slate-500 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0l-3.586-3.586a2 2 0 00-2.828 0L12 14m0 0l-3.586-3.586a2 2 0 00-2.828 0L4 14" />
+                    </svg>
+                    <p class="text-sm font-semibold">Жаңа тапсырыстар тіркелмеген</p>
+                    <p class="text-xs text-slate-600 mt-1">Клиенттер себет арқылы тапсырыс бергенде осы жерге шығады.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- АДМИН-ТАБ 2: ТАУАРЛАРДЫ БАСҚАРУ (ҚОСУ/ӨҢДЕУ/ӨШІРУ) -->
+        <div id="admin-products-content" class="admin-tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Сол жақ: Тауар қосу/редакциялау формасы -->
+                <div class="lg:col-span-1 glass-panel p-6 rounded-2xl border border-slate-800/80 shadow-md h-fit">
+                    <h3 id="form-action-title" class="text-lg font-bold text-white mb-6 flex items-center gap-2 border-b border-slate-800 pb-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-violet-500"></span> Тауар Қосу
+                    </h3>
+                    <form id="add-product-form" onsubmit="addProduct(event)" class="space-y-4">
+                        <input type="hidden" id="prod-id" value="">
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">Тауар Атауы</label>
+                            <input type="text" id="prod-title" required placeholder="Мысалы: Механикалық пернетақта..."
+                                class="w-full px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-200">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">Санаты</label>
+                                <select id="prod-category" required class="w-full px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-300">
+                                    <option value="laptops">Ноутбуктер</option>
+                                    <option value="keyboards">Пернетақталар</option>
+                                    <option value="mice">Тінтуірлер</option>
+                                    <option value="headphones">Құлаққаптар</option>
+                                    <option value="accessories">Аксессуарлар</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">Бағасы (₸)</label>
+                                <input type="number" id="prod-price" required placeholder="95000"
+                                    class="w-full px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-200">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">Сурет Сілтемесі (URL)</label>
+                            <input type="url" id="prod-img" required placeholder="https://images.unsplash.com/..."
+                                class="w-full px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-200">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">Толық сипаттамасы</label>
+                            <textarea id="prod-desc" required rows="4" placeholder="Тауардың ерекшеліктері, техникалық сипаттамалары..."
+                                class="w-full px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-200 resize-none"></textarea>
+                        </div>
+
+                        <div class="flex gap-2.5 pt-2">
+                            <button type="submit" id="form-submit-btn"
+                                class="flex-grow bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-indigo-600/30 cursor-pointer text-sm">
+                                Сақтау
+                            </button>
+                            <button type="button" id="cancel-edit-btn" onclick="resetForm()" class="hidden px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold transition cursor-pointer text-sm">
+                                Болдырмау
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Оң жақ: Қазіргі тауарлар кестесі -->
+                <div class="lg:col-span-2 glass-panel p-6 rounded-2xl border border-slate-800/80 shadow-md">
+                    <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2 border-b border-slate-800 pb-3">
+                        <span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span> Қазіргі ассортимент тізімі
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-slate-400 text-xs font-bold tracking-wider uppercase">
+                                    <th class="pb-3">Сурет</th>
+                                    <th class="pb-3 px-4">Тауар атауы</th>
+                                    <th class="pb-3 px-4">Санаты</th>
+                                    <th class="pb-3 px-4">Бағасы</th>
+                                    <th class="pb-3 text-right">Әрекет</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-products-table" class="divide-y divide-slate-800/60">
+                                <!-- Тауар жолдары JS арқылы шығады -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- СИДАРТ-СЕБЕТ (SHOPPING CART DRAWER - SLIDES FROM RIGHT) -->
+    <div id="cart-drawer-backdrop" onclick="toggleCart(false)" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300">
+        <div id="cart-drawer" onclick="event.stopPropagation()" class="absolute top-0 right-0 h-full w-full sm:w-[480px] bg-[#0E131F]/95 backdrop-blur-md border-l border-slate-800 shadow-2xl flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out">
+            <!-- Header -->
+            <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/40">
+                <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <h3 class="text-xl font-bold text-white tracking-wide">Сіздің Себетіңіз</h3>
+                </div>
+                <button onclick="toggleCart(false)" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Сатылатын тауарлар тізімі -->
+            <div id="cart-items-container" class="flex-grow p-6 overflow-y-auto space-y-4">
+                <!-- Тауарлар динамикалы түрде шығады -->
+            </div>
+
+            <!-- Footer (Total Price & Order Action) -->
+            <div class="p-6 border-t border-slate-800 bg-slate-900/50">
+                <div class="space-y-3 mb-6">
+                    <div class="flex justify-between text-sm text-slate-400">
+                        <span>Тауар саны:</span>
+                        <span id="cart-total-count" class="font-bold text-slate-200">0 дана</span>
+                    </div>
+                    <div class="flex justify-between text-sm text-slate-400">
+                        <span>Жеткізу:</span>
+                        <span class="font-bold text-emerald-400">ТЕГІН (Қазақстан бойынша)</span>
+                    </div>
+                    <div class="border-t border-slate-800/80 pt-3 flex justify-between items-end">
+                        <span class="text-base font-medium text-slate-200">Жалпы сомасы:</span>
+                        <span id="cart-total-price" class="text-2xl font-black text-cyan-400">0 ₸</span>
+                    </div>
+                </div>
+                <button onclick="openCheckout()" id="checkout-btn" class="w-full py-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-xl font-bold text-base shadow-[0_0_20px_rgba(99,102,241,0.4)] transition cursor-pointer flex justify-center items-center gap-2">
+                    <span>Тапсырыс беруге өту</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ТАУАРДЫҢ ТОЛЫҚ МӘЛІМЕТІ МОДАЛЬДІ ТЕРЕЗЕСІ (PRODUCT DETAIL MODAL) -->
+    <div id="detail-modal" onclick="closeDetailModal()" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden justify-center items-center p-4">
+        <div onclick="event.stopPropagation()" class="glass-panel w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl relative border border-slate-800 flex flex-col md:flex-row">
+            <!-- Жабу батырмасы -->
+            <button onclick="closeDetailModal()" class="absolute top-4 right-4 z-10 p-2 text-slate-400 hover:text-white rounded-full bg-slate-900/60 hover:bg-slate-800 transition cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            
+            <!-- Сол жағы: Сурет -->
+            <div class="w-full md:w-1/2 h-64 md:h-[450px] bg-slate-900/40 relative">
+                <img id="modal-img" src="" alt="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0B0F19] to-transparent opacity-50"></div>
+                <span id="modal-cat" class="absolute bottom-4 left-4 text-xs font-bold bg-indigo-600/90 text-white px-3 py-1 rounded-full uppercase tracking-wider">Санат</span>
+            </div>
+
+            <!-- Оң жағы: Сипаттама -->
+            <div class="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-between">
+                <div>
+                    <span class="text-[10px] font-bold text-violet-400 tracking-widest uppercase">TECH_SHOP EXCLUSIVE</span>
+                    <h3 id="modal-title" class="text-2xl md:text-3xl font-extrabold text-white mt-1 mb-3">Құрылғы Атауы</h3>
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="flex text-amber-400">★★★★★</div>
+                        <span class="text-slate-400 text-xs">(4.9 • 48 пікір)</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        <span class="text-emerald-400 text-xs font-medium">Қоймада бар</span>
+                    </div>
+                    <p id="modal-desc" class="text-slate-300 text-sm leading-relaxed mb-6">
+                        Толық сипаттамасы осында жазылады...
+                    </p>
+                </div>
+
+                <div>
+                    <!-- Kaspi Installment simulation badge -->
+                    <div class="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-white font-bold bg-red-600 text-[10px] px-2 py-0.5 rounded uppercase">Kaspi.kz</span>
+                            <span class="text-red-400 text-xs font-semibold">Бөліп төлеу 0-0-12</span>
+                        </div>
+                        <span id="modal-installment" class="text-white font-bold text-xs">айына 0 ₸ бастап</span>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-4 mt-6">
+                        <div>
+                            <span class="text-xs text-slate-500 block">Бағасы:</span>
+                            <span id="modal-price" class="text-2xl md:text-3xl font-black text-cyan-400">0 ₸</span>
+                        </div>
+                        <button id="modal-add-btn" class="flex-grow py-3 px-6 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-xl font-bold text-sm shadow-[0_0_20px_rgba(99,102,241,0.4)] transition cursor-pointer text-center">
+                            Себетке қосу
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ТАПСЫРЫС БЕРУ & KASPI QR МОДАЛЬДІ ТЕРЕЗЕСІ (CHECKOUT & QR MODAL) -->
+    <div id="checkout-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden justify-center items-center p-4">
+        <div class="glass-panel w-full max-w-xl rounded-3xl overflow-hidden shadow-2xl relative border border-slate-800">
+            <!-- Жабу батырмасы -->
+            <button onclick="closeCheckout()" class="absolute top-4 right-4 z-10 p-2 text-slate-400 hover:text-white rounded-full bg-slate-900/60 hover:bg-slate-800 transition cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <!-- Оформление беті -->
+            <div id="checkout-form-step" class="p-6 sm:p-10">
+                <h3 class="text-2xl font-extrabold text-white mb-2">Тапсырысты Рәсімдеу</h3>
+                <p class="text-slate-400 text-xs mb-6">Жеткізу ақпаратын толтырып, ыңғайлы төлем әдісін таңдаңыз.</p>
+
+                <form onsubmit="submitCheckout(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">Аты-жөніңіз</label>
+                        <input type="text" id="cust-name" required placeholder="Мысалы: Дархан Ахметов..."
+                            class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-200">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">Телефон нөмірі</label>
+                            <input type="tel" id="cust-phone" required placeholder="+7 (707) 123-4567"
+                                class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-200">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">Қалаңыз</label>
+                            <select id="cust-city" required class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-300">
+                                <option value="Ақтау">Ақтау</option>
+                                <option value="Алматы">Алматы</option>
+                                <option value="Астана">Астана</option>
+                                <option value="Шымкент">Шымкент</option>
+                                <option value="Қарағанды">Қарағанды</option>
+                                <option value="Атырау">Атырау</option>
+                                <option value="Ақтөбе">Ақтөбе</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-1.5">Жеткізу Мекенжайы</label>
+                        <input type="text" id="cust-address" required placeholder="Көше аты, үй нөмірі, пәтер..."
+                            class="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-slate-200">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Төлем Әдісі</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <label class="border border-slate-800 rounded-xl p-3 flex flex-col items-center justify-between text-center cursor-pointer hover:bg-slate-900 transition bg-slate-900/20 active-pay-border">
+                                <input type="radio" name="payment-method" value="kaspi" checked class="sr-only" onchange="updatePayBorder(this)">
+                                <span class="bg-red-600 text-white font-bold text-[9px] px-1.5 py-0.5 rounded tracking-wide uppercase">Kaspi QR</span>
+                                <span class="text-[10px] text-slate-400 mt-2 font-medium">Тегін 0%</span>
+                            </label>
+                            <label class="border border-slate-800 rounded-xl p-3 flex flex-col items-center justify-between text-center cursor-pointer hover:bg-slate-900 transition bg-slate-900/20">
+                                <input type="radio" name="payment-method" value="card" class="sr-only" onchange="updatePayBorder(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                </svg>
+                                <span class="text-[10px] text-slate-400 mt-2 font-medium">Банк картасы</span>
+                            </label>
+                            <label class="border border-slate-800 rounded-xl p-3 flex flex-col items-center justify-between text-center cursor-pointer hover:bg-slate-900 transition bg-slate-900/20">
+                                <input type="radio" name="payment-method" value="cash" class="sr-only" onchange="updatePayBorder(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <span class="text-[10px] text-slate-400 mt-2 font-medium">Қолма-қол</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-800/80 pt-4 flex justify-between items-center mt-6">
+                        <div>
+                            <span class="text-xs text-slate-400 block">Төленетін жалпы сома:</span>
+                            <span id="checkout-total-price" class="text-2xl font-black text-cyan-400">0 ₸</span>
+                        </div>
+                        <button type="submit" class="px-8 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-xl font-bold text-sm shadow-[0_0_15px_rgba(99,102,241,0.3)] transition cursor-pointer">
+                            Жалғастыру
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Имитация Kaspi QR төлемі (QR Simulation Step) -->
+            <div id="checkout-qr-step" class="p-6 sm:p-10 hidden flex flex-col items-center text-center">
+                <div class="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mb-6 shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                    <span class="text-white font-extrabold text-lg uppercase tracking-widest bg-red-600 px-2 py-0.5 rounded">Kaspi</span>
+                </div>
+                <h3 class="text-2xl font-extrabold text-white mb-2">Kaspi QR арқылы төлеу</h3>
+                <p class="text-slate-400 text-sm max-w-sm mb-6">Телефоныңыздағы Kaspi.kz қосымшасын ашып, төмендегі QR-кодты сканерлеңіз.</p>
+                
+                <!-- QR-код Имитациясы -->
+                <div class="p-4 bg-white rounded-2xl mb-6 shadow-2xl relative group">
+                    <div class="absolute inset-0 bg-red-500/10 filter blur-xl group-hover:blur-2xl transition duration-300 rounded-2xl"></div>
+                    <div class="w-48 h-48 border-[6px] border-[#080B11] flex flex-col justify-between p-3 relative bg-white rounded-xl">
+                        <!-- Custom CSS generated beautiful futuristic mock QR-code -->
+                        <div class="flex justify-between w-full h-1/4">
+                            <div class="w-10 h-10 border-4 border-slate-900 bg-slate-900 rounded"></div>
+                            <div class="flex-grow flex flex-wrap gap-1 px-2 py-1 justify-center">
+                                <div class="w-1.5 h-1.5 bg-slate-900"></div><div class="w-1.5 h-1.5 bg-slate-900"></div>
+                                <div class="w-1.5 h-1.5 bg-slate-900"></div><div class="w-1.5 h-1.5 bg-slate-900"></div>
+                            </div>
+                            <div class="w-10 h-10 border-4 border-slate-900 bg-slate-900 rounded"></div>
+                        </div>
+                        <div class="flex-grow flex flex-col justify-center py-2 gap-2">
+                            <div class="flex justify-between px-2">
+                                <div class="w-2.5 h-2.5 bg-slate-900"></div>
+                                <div class="w-2.5 h-2.5 bg-red-600 animate-pulse"></div>
+                                <div class="w-2.5 h-2.5 bg-slate-900"></div>
+                                <div class="w-2.5 h-2.5 bg-slate-900"></div>
+                            </div>
+                            <div class="flex justify-between px-4">
+                                <div class="w-2.5 h-2.5 bg-slate-900"></div>
+                                <div class="w-4 h-2.5 bg-slate-900"></div>
+                                <div class="w-2.5 h-2.5 bg-slate-900"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between w-full h-1/4 items-end">
+                            <div class="w-10 h-10 border-4 border-slate-900 bg-slate-900 rounded"></div>
+                            <div class="flex-grow flex flex-wrap gap-1 px-2 py-1 justify-center">
+                                <div class="w-1.5 h-1.5 bg-slate-900"></div><div class="w-1.5 h-1.5 bg-slate-900"></div>
+                            </div>
+                            <div class="w-10 h-10 border-4 border-slate-900 rounded flex items-center justify-center">
+                                <div class="w-4 h-4 bg-slate-900 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 w-full mb-6 flex justify-between items-center text-left">
+                    <div>
+                        <span class="text-[10px] text-slate-500 block uppercase font-bold tracking-wider">Тапсырыс сомасы</span>
+                        <span id="qr-total-price" class="text-xl font-black text-cyan-400">0 ₸</span>
+                    </div>
+                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
+                        <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-ping"></span>
+                        Сканерлеуді күтуде...
+                    </span>
+                </div>
+
+                <div class="flex gap-3 w-full">
+                    <button onclick="simulateSuccessfulPayment()" class="flex-grow py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-sm shadow-[0_0_15px_rgba(16,185,129,0.3)] transition cursor-pointer">
+                        Төлемді растау (Симуляция)
+                    </button>
+                    <button onclick="backToCheckoutForm()" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold text-sm transition cursor-pointer">
+                        Артқа
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Төменгі Футер (Footer) -->
+    <footer class="glass-panel border-t border-slate-800/80 mt-16 bg-[#06080D]/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="text-center md:text-left">
+                <span class="text-2xl bg-gradient-to-r from-violet-500 to-cyan-400 bg-clip-text text-transparent font-black tracking-wide">⚡ TECH_SHOP</span>
+                <p class="text-slate-500 text-xs mt-2 max-w-sm">Қазақстан нарығындағы ең озық электроника мен девайстардың премиум каталогы.</p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-6 text-sm text-slate-400 font-medium">
+                <a href="#" onclick="showPage('shop')" class="hover:text-cyan-400 transition">Каталог</a>
+                <a href="#" onclick="showPage('admin')" class="hover:text-indigo-400 transition">Әкімшілік панель</a>
+                <a href="#" onclick="alert('Техникалық көмек көрсету нөмірі: +7 (707) 999-88-77')" class="hover:text-white transition">Қолдау қызметі</a>
+            </div>
+            <div class="text-center md:text-right text-xs text-slate-600">
+                <p>© 2026 TECH_SHOP ЖШС. Барлық құқықтар қорғалған.</p>
+                <p class="mt-1">Әзірленген: Antigravity AI</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Скрипттер мен Логиканы басқару -->
+    <script>
+        // БАСТАПҚЫ БАЙ ТАУАРЛАР ТІЗІМІ (8-10 сапалы девайстар)
+        const defaultProducts = [
+            { 
+                id: 1, 
+                title: "MacBook Pro 16\" M3 Max", 
+                price: 1450000, 
+                img: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80",
+                category: "laptops",
+                desc: "Apple M3 Max чипі, 36GB ортақ жады, 1TB SSD. 16 дюймдік керемет Liquid Retina XDR дисплейі. Кәсіби бағдарламашыларға, дизайнерлерге және видео-монтаждаушыларға арналған алып күш."
+            },
+            { 
+                id: 2, 
+                title: "ASUS ROG Zephyrus G14", 
+                price: 890000, 
+                img: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80",
+                category: "laptops",
+                desc: "AMD Ryzen 9, NVIDIA RTX 4070, 32GB RAM, 1TB SSD. Ойын әлемінің ең озық графиктері мен жоғары жылдамдықты қамтамасыз ететін премиум дизайнды жеңіл ойын ноутбугі."
+            },
+            { 
+                id: 3, 
+                title: "Keychron Q1 Pro Механикалық Пернетақта", 
+                price: 95000, 
+                img: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80",
+                category: "keyboards",
+                desc: "Толық алюминий корпус, Bluetooth 5.1 / Сымды қосылу, Hot-swappable механикалық свитчтері және оңай реттелетін RGB жарығы. Мәтін жазуға өте ыңғайлы премиум пернетақта."
+            },
+            { 
+                id: 4, 
+                title: "Logitech G Pro X Superlight 2", 
+                price: 78000, 
+                img: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=800&q=80",
+                category: "mice",
+                desc: "Киберспортшыларға арналған аса жеңіл сымсыз тінтуір. Салмағы небәрі 60 грамм. Жоғары дәлдікті HERO 2 сенсоры, 32000 DPI жылдамдық және ұзақ жұмыс жасайтын аккумулятор."
+            },
+            { 
+                id: 5, 
+                title: "Sony WH-1000XM5 Сымсыз Құлаққаптары", 
+                price: 185000, 
+                img: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=800&q=80",
+                category: "headphones",
+                desc: "Әлемдегі ең үздік белсенді шуды басу (ANC) технологиясы бар сымсыз премиум құлаққаптар. Таза дыбыс, LDAC қолдауы, 30 сағаттық жұмыс уақыты және микрофонның ерекше сапасы."
+            },
+            { 
+                id: 6, 
+                title: "HyperX Cloud III Сымсыз Ойын Гарнитурасы", 
+                price: 74000, 
+                img: "https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?auto=format&fit=crop&w=800&q=80",
+                category: "headphones",
+                desc: "Ұзақ ойын сессияларына арналған аса жайлы құлаққаптар. Дыбыстың айқын деңгейі, берік алюминий жақтауы, 120 сағатқа жететін алып батарея сыйымдылығы."
+            },
+            { 
+                id: 7, 
+                title: "Samsung Odyssey G7 27\" Curved Мониторы", 
+                price: 210000, 
+                img: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80",
+                category: "accessories",
+                desc: "240Hz экран жиілігі, 1ms жауап беру уақыты, QLED технологиясы және 1000R майысу радиусы бар кәсіби ойын және жұмыс мониторы. Терең бейне сапасы үшін тамаша таңдау."
+            },
+            { 
+                id: 8, 
+                title: "Apple AirPods Pro 2", 
+                price: 125000, 
+                img: "https://images.unsplash.com/photo-1588449668338-d15168b5a4c5?auto=format&fit=crop&w=800&q=80",
+                category: "headphones",
+                desc: "Жетілдірілген H2 чипі, 2 есе тиімді белсенді шуды басу жүйесі және дыбысты айналадан тарататын адаптивті аудио мүмкіндігі бар Apple-дің ең танымал құлаққабы."
+            },
+            { 
+                id: 9, 
+                title: "Razer DeathAdder V3 Pro", 
+                price: 69000, 
+                img: "https://images.unsplash.com/photo-1625890210171-6dd599103716?auto=format&fit=crop&w=800&q=80",
+                category: "mice",
+                desc: "Небәрі 63 грамм салмақпен киберспорт әлемін бағындырған эргономикалық сымсыз тінтуір. Focus Pro 30K оптикалық сенсоры мен свитчтерінің максималды дәлдігі."
+            },
+            { 
+                id: 10, 
+                title: "Elgato Stream Deck MK.2", 
+                price: 85000, 
+                img: "https://images.unsplash.com/photo-1598550476439-6847785fce6e?auto=format&fit=crop&w=800&q=80",
+                category: "accessories",
+                desc: "Стримерлер мен кәсіби мамандарға арналған 15 интерактивті LCD батырмасы бар басқару пульті. Бір басу арқылы қолданбаларды іске қосуға және әрекеттерді жеңілдетуге болады."
+            }
+        ];
+
+        // БРАУЗЕРДЕГІ ДЕРЕКТЕРДІ ІСКЕ ҚОСУ
+        let products = JSON.parse(localStorage.getItem('shop_products_kz')) || defaultProducts;
+        let cart = JSON.parse(localStorage.getItem('shop_cart_kz')) || [];
+        let orders = JSON.parse(localStorage.getItem('shop_orders_kz')) || [];
+
+        // Ағымдағы сүзгілердің күйі
+        let activeCategory = 'all';
+        let searchQuery = '';
+
+        // ТОАСТ ХАБАРЛАМАЛАРЫ ЖҮЙЕСІ (Glowing Toasts)
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let typeClasses = 'border-violet-500 bg-slate-950/90 text-violet-300 shadow-[0_0_15px_rgba(99,102,241,0.25)]';
+            let iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            
+            if (type === 'success') {
+                typeClasses = 'border-emerald-500 bg-slate-950/90 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.25)]';
+                iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else if (type === 'danger') {
+                typeClasses = 'border-red-500 bg-slate-950/90 text-red-300 shadow-[0_0_15px_rgba(239,68,68,0.25)]';
+                iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>`;
+            }
+
+            toast.className = `toast-item glass-panel border flex items-center gap-3 p-4 rounded-2xl w-full pointer-events-auto transition duration-300 ${typeClasses}`;
+            toast.innerHTML = `
+                <div class="flex-shrink-0">${iconSvg}</div>
+                <div class="flex-grow text-xs font-semibold tracking-wide">${message}</div>
+                <button onclick="this.parentElement.remove()" class="text-slate-500 hover:text-slate-300 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // 4 секундтан кейін жоғалуы
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'scale(0.9)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // БЕТТЕРДІ АУЫСТЫРУ (Дүкен / Админка)
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(`${pageId}-page`).classList.add('active');
+
+            // Навигация батырмаларының белсенді күйі
+            const shopBtn = document.getElementById('nav-btn-shop');
+            const adminBtn = document.getElementById('nav-btn-admin');
+            
+            if (pageId === 'shop') {
+                shopBtn.className = "px-4 py-2 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 shadow-[0_0_10px_rgba(6,182,212,0.15)] cursor-pointer";
+                adminBtn.className = "px-4 py-2 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 border border-slate-800 hover:border-indigo-500/50 hover:bg-indigo-500/10 text-slate-300 cursor-pointer";
+            } else {
+                adminBtn.className = "px-4 py-2 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 shadow-[0_0_10px_rgba(99,102,241,0.15)] cursor-pointer";
+                shopBtn.className = "px-4 py-2 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 border border-slate-800 hover:border-cyan-500/50 hover:bg-cyan-500/10 text-slate-300 cursor-pointer";
+                
+                // Админка ашылғанда оның кестелерін синхрондау
+                renderAdminTable();
+                renderOrdersTable();
+                renderStats();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // КАТЕГОРИЯ СҮЗГІСІН ОРНАТУ
+        function setCategory(catId) {
+            activeCategory = catId;
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.className = "cat-btn px-4 py-2 rounded-xl text-xs font-semibold transition border border-slate-800 hover:border-slate-700 bg-slate-900/40 text-slate-300 cursor-pointer";
+            });
+            document.getElementById(`cat-btn-${catId}`).className = "cat-btn px-4 py-2 rounded-xl text-xs font-semibold transition bg-indigo-600 text-white shadow-[0_0_10px_rgba(99,102,241,0.4)] border border-indigo-500 cursor-pointer";
+            
+            applyFilters();
+        }
+
+        // СҮЗГІЛЕУ МЕН СҰРЫПТАУДЫ ҚОЛДАНУ (Search, Category, Sorting)
+        function applyFilters() {
+            searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+            const sortVal = document.getElementById('sort-select').value;
+            
+            let filtered = products.filter(prod => {
+                const matchCategory = activeCategory === 'all' || prod.category === activeCategory;
+                const matchSearch = prod.title.toLowerCase().includes(searchQuery) || 
+                                    (prod.desc && prod.desc.toLowerCase().includes(searchQuery));
+                return matchCategory && matchSearch;
+            });
+
+            // Сұрыптау
+            if (sortVal === 'price-asc') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (sortVal === 'price-desc') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (sortVal === 'name-asc') {
+                filtered.sort((a, b) => a.title.localeCompare(b.title));
+            }
+
+            renderProducts(filtered);
+            document.getElementById('results-count').innerText = `Тауар саны: ${filtered.length}`;
+        }
+
+        // ДҮКЕН КАТАЛОГЫН ШЫҒАРУ (Render Catalog Grid)
+        function renderProducts(items = products) {
+            const grid = document.getElementById('products-grid');
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-16 text-slate-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-slate-700 mb-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-lg font-bold text-slate-400">Сұраныс бойынша тауар табылмады</p>
+                        <p class="text-sm text-slate-600 mt-1">Іздеу сөзін өзгертіп көріңіз немесе өзге санатты таңдаңыз.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = items.map(prod => {
+                const installmentPrice = Math.round(prod.price / 12);
+                return `
+                    <div onclick="openDetailModal(${prod.id})" class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between cursor-pointer group relative">
+                        <!-- Сурет -->
+                        <div class="h-48 overflow-hidden relative bg-slate-950/40">
+                            <img src="${prod.img}" alt="${prod.title}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-80"></div>
+                            
+                            <!-- Санаты белгішесі -->
+                            <span class="absolute top-3 left-3 text-[9px] font-bold bg-[#090D16]/95 border border-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                                ${prod.category === 'laptops' ? 'Ноутбук' : 
+                                  prod.category === 'keyboards' ? 'Пернетақта' : 
+                                  prod.category === 'mice' ? 'Тінтуір' : 
+                                  prod.category === 'headphones' ? 'Құлаққап' : 'Аксессуар'}
+                            </span>
+                        </div>
+                        
+                        <!-- Деректері -->
+                        <div class="p-5 flex-grow flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-white text-base mb-2 group-hover:text-cyan-300 transition duration-200 line-clamp-2">${prod.title}</h3>
+                                <div class="flex items-center space-x-1.5 mb-4 text-[10px]">
+                                    <span class="text-amber-400">★★★★★</span>
+                                    <span class="text-slate-500 font-medium">4.9 (48)</span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <!-- Kaspi Installment simulation badge -->
+                                <div class="mb-3.5 px-2.5 py-1.5 bg-red-600/10 border border-red-500/15 rounded-lg flex items-center justify-between text-[10px]">
+                                    <span class="text-red-400 font-bold bg-red-500/10 px-1.5 py-0.25 rounded uppercase">Kaspi 0-0-12</span>
+                                    <span class="text-white font-extrabold">${installmentPrice.toLocaleString()} ₸ / айына</span>
+                                </div>
+
+                                <div class="flex justify-between items-center mt-3 gap-2">
+                                    <div>
+                                        <span class="text-[9px] text-slate-500 block">Бағасы:</span>
+                                        <span class="text-lg font-black text-cyan-400">${prod.price.toLocaleString()} ₸</span>
+                                    </div>
+                                    <button onclick="event.stopPropagation(); addToCart(${prod.id})" class="px-3.5 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl transition-all shadow-md hover:shadow-indigo-600/30 cursor-pointer flex items-center gap-1.5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Себетке
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ТАУАРДЫҢ ТОЛЫҚ МӘЛІМЕТІН АШУ (Open Detail Modal)
+        function openDetailModal(id) {
+            const prod = products.find(p => p.id === id);
+            if (!prod) return;
+
+            document.getElementById('modal-img').src = prod.img;
+            document.getElementById('modal-img').alt = prod.title;
+            document.getElementById('modal-title').innerText = prod.title;
+            document.getElementById('modal-desc').innerText = prod.desc || "Бұл тауардың толық сипаттамасы жуырда қосылады. Техникалық жағынан озық, заманауи және премиум деңгейдегі сенімді құрылғы.";
+            document.getElementById('modal-price').innerText = `${prod.price.toLocaleString()} ₸`;
+            
+            const installmentVal = Math.round(prod.price / 12);
+            document.getElementById('modal-installment').innerText = `айына ${installmentVal.toLocaleString()} ₸ бастап`;
+            
+            // Санаты мәтіні
+            const catBadge = document.getElementById('modal-cat');
+            catBadge.innerText = prod.category === 'laptops' ? 'Ноутбуктер' : 
+                                prod.category === 'keyboards' ? 'Пернетақталар' : 
+                                prod.category === 'mice' ? 'Тінтуірлер' : 
+                                prod.category === 'headphones' ? 'Құлаққаптар' : 'Аксессуарлар';
+
+            // Қосу батырмасының логикасы
+            const addBtn = document.getElementById('modal-add-btn');
+            addBtn.onclick = () => {
+                addToCart(prod.id);
+                closeDetailModal();
+            };
+
+            const modal = document.getElementById('detail-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeDetailModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // СЕБЕТТІ АШУ / ЖАБУ (Toggle Side-Cart Drawer)
+        function toggleCart(isOpen) {
+            const backdrop = document.getElementById('cart-drawer-backdrop');
+            const drawer = document.getElementById('cart-drawer');
+            
+            if (isOpen) {
+                renderCart();
+                backdrop.classList.remove('hidden');
+                setTimeout(() => {
+                    backdrop.classList.remove('opacity-0');
+                    drawer.classList.remove('translate-x-full');
+                }, 10);
+            } else {
+                backdrop.classList.add('opacity-0');
+                drawer.classList.add('translate-x-full');
+                setTimeout(() => {
+                    backdrop.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        // СЕБЕТКЕ ТАУАР ҚОСУ (Add item to cart)
+        function addToCart(id) {
+            const prod = products.find(p => p.id === id);
+            if (!prod) return;
+
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({
+                    id: prod.id,
+                    title: prod.title,
+                    price: prod.price,
+                    img: prod.img,
+                    quantity: 1
+                });
+            }
+
+            saveCart();
+            showToast(`"${prod.title}" себетке қосылды!`);
+        }
+
+        // СЕБЕТТІ РЕНДЕРЛЕУ (Render Items in side cart)
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const totalCountEl = document.getElementById('cart-total-count');
+            const totalPriceEl = document.getElementById('cart-total-price');
+            const counterBadge = document.getElementById('cart-counter');
+
+            let totalCount = 0;
+            let totalPrice = 0;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-slate-500 py-16 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-slate-700 mb-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        <p class="text-base font-bold text-slate-400">Себет әзірге бос</p>
+                        <p class="text-xs text-slate-600 mt-1 max-w-[200px]">Дүкеннен өзіңізге ұнаған тауарларды осында қосыңыз.</p>
+                    </div>
+                `;
+                totalCountEl.innerText = `0 дана`;
+                totalPriceEl.innerText = `0 ₸`;
+                counterBadge.innerText = `0`;
+                document.getElementById('checkout-btn').disabled = true;
+                document.getElementById('checkout-btn').className = "w-full py-4 bg-slate-800 text-slate-500 rounded-xl font-bold text-base cursor-not-allowed flex justify-center items-center gap-2";
+                return;
+            }
+
+            document.getElementById('checkout-btn').disabled = false;
+            document.getElementById('checkout-btn').className = "w-full py-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-xl font-bold text-base shadow-[0_0_20px_rgba(99,102,241,0.4)] transition cursor-pointer flex justify-center items-center gap-2";
+
+            container.innerHTML = cart.map(item => {
+                totalCount += item.quantity;
+                totalPrice += item.price * item.quantity;
+
+                return `
+                    <div class="glass-panel p-4 rounded-xl border border-slate-800/80 flex items-center gap-4 relative">
+                        <img src="${item.img}" alt="${item.title}" class="w-16 h-16 object-cover rounded-lg border border-slate-800 bg-slate-900">
+                        <div class="flex-grow min-w-0">
+                            <h4 class="text-sm font-semibold text-white truncate">${item.title}</h4>
+                            <span class="text-xs text-cyan-400 font-bold block mt-1">${item.price.toLocaleString()} ₸</span>
+                            
+                            <!-- Санды басқару -->
+                            <div class="flex items-center space-x-2 mt-2">
+                                <button onclick="updateQty(${item.id}, -1)" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white flex items-center justify-center cursor-pointer transition">-</button>
+                                <span class="text-xs font-bold text-slate-300 w-6 text-center">${item.quantity}</span>
+                                <button onclick="updateQty(${item.id}, 1)" class="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white flex items-center justify-center cursor-pointer transition">+</button>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart(${item.id})" class="absolute top-4 right-4 text-slate-500 hover:text-red-400 transition cursor-pointer" title="Өшіру">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            totalCountEl.innerText = `${totalCount} дана`;
+            totalPriceEl.innerText = `${totalPrice.toLocaleString()} ₸`;
+            counterBadge.innerText = totalCount;
+        }
+
+        // САНДЫ ӨЗГЕРТУ (Update quantity)
+        function updateQty(id, change) {
+            const item = cart.find(i => i.id === id);
+            if (!item) return;
+
+            item.quantity += change;
+            if (item.quantity <= 0) {
+                cart = cart.filter(i => i.id !== id);
+                showToast(`Себеттен өшірілді`, 'danger');
+            }
+            saveCart();
+            renderCart();
+        }
+
+        // СЕБЕТТЕН ӨШІРУ (Remove entirely)
+        function removeFromCart(id) {
+            cart = cart.filter(i => i.id !== id);
+            saveCart();
+            renderCart();
+            showToast(`Себеттен өшірілді`, 'danger');
+        }
+
+        // СЕБЕТТІ САҚТАУ (Save and update counter)
+        function saveCart() {
+            localStorage.setItem('shop_cart_kz', JSON.stringify(cart));
+            // Шапкадағы себет санын жаңарту
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-counter').innerText = count;
+        }
+
+        // ТАПСЫРЫС БЕРУ ТЕРЕЗЕСІН АШУ (Open checkout flow)
+        function openCheckout() {
+            toggleCart(false);
+            
+            let totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('checkout-total-price').innerText = `${totalPrice.toLocaleString()} ₸`;
+            document.getElementById('qr-total-price').innerText = `${totalPrice.toLocaleString()} ₸`;
+
+            // Бірінші бетті көрсету, екіншісін жабу
+            document.getElementById('checkout-form-step').classList.remove('hidden');
+            document.getElementById('checkout-qr-step').classList.add('hidden');
+
+            const modal = document.getElementById('checkout-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCheckout() {
+            const modal = document.getElementById('checkout-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // ТӨЛЕМ ТҮРІ ТАҢДАЛҒАНДА ШЕКАРАНЫ СӘНДЕУ
+        function updatePayBorder(radio) {
+            // Барлық төлем таңдауларынан шекараны өшіру
+            radio.closest('.grid').querySelectorAll('label').forEach(label => {
+                label.className = "border border-slate-800 rounded-xl p-3 flex flex-col items-center justify-between text-center cursor-pointer hover:bg-slate-900 transition bg-slate-900/20";
+            });
+            // Таңдалғанға қосу
+            radio.closest('label').className = "border border-indigo-500 rounded-xl p-3 flex flex-col items-center justify-between text-center cursor-pointer bg-slate-900/40 shadow-[0_0_12px_rgba(99,102,241,0.15)] transition";
+        }
+
+        // ТАПСЫРЫС ФОРМАСЫН ЖОЛДАУ
+        function submitCheckout(event) {
+            event.preventDefault();
+
+            const payMethod = document.querySelector('input[name="payment-method"]:checked').value;
+
+            if (payMethod === 'kaspi') {
+                // QR Имитациясына ауысу
+                document.getElementById('checkout-form-step').classList.add('hidden');
+                document.getElementById('checkout-qr-step').classList.remove('hidden');
+            } else {
+                // Басқа әдіс таңдалғанда тікелей сәтті аяқтау
+                completeOrderSimulation(payMethod === 'card' ? 'Банк картасы' : 'Жеткізілгенде қолма-қол');
+            }
+        }
+
+        function backToCheckoutForm() {
+            document.getElementById('checkout-qr-step').classList.add('hidden');
+            document.getElementById('checkout-form-step').classList.remove('hidden');
+        }
+
+        // QR ТӨЛЕМІН СИМУЛЯЦИЯЛАУ (Confirm simulated payment)
+        function simulateSuccessfulPayment() {
+            completeOrderSimulation('Kaspi QR төлемі');
+        }
+
+        // ТАПСЫРЫСТЫ ДЕРЕКТЕР БАЗАСЫНА ЖАЗУ (Save order log)
+        function completeOrderSimulation(paymentName) {
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            const city = document.getElementById('cust-city').value;
+            const address = document.getElementById('cust-address').value;
+            
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const itemsSummary = cart.map(i => `${i.title} (x${i.quantity})`).join(', ');
+
+            const newOrder = {
+                id: Date.now(),
+                customerName: name,
+                customerPhone: phone,
+                customerCity: city,
+                customerAddress: address,
+                items: itemsSummary,
+                totalPrice: totalPrice,
+                paymentMethod: paymentName,
+                date: new Date().toLocaleDateString('kk-KZ', { hour: '2-digit', minute: '2-digit' }),
+                status: 'Жаңа' // Жаңа, Дайындалуда, Жеткізілуде, Аяқталды, Бас тартылды
+            };
+
+            orders.push(newOrder);
+            localStorage.setItem('shop_orders_kz', JSON.stringify(orders));
+
+            // Себетті толық тазарту
+            cart = [];
+            saveCart();
+
+            closeCheckout();
+            showToast("Тапсырыс сәтті рәсімделді және деректер қорына жазылды!", 'success');
+
+            // Админка ашық болса кестені жаңарту
+            renderOrdersTable();
+            renderStats();
+        }
+
+        // АДМИН-ПАНЕЛЬ ІШКІ ТАБТАРЫН АУЫСТЫРУ
+        function setAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+                btn.className = "admin-tab-btn pb-3 px-2 font-bold text-sm tracking-wide transition border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer";
+            });
+            document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.add('hidden'));
+
+            document.getElementById(`admin-tab-${tabName}`).className = "admin-tab-btn pb-3 px-2 font-bold text-sm tracking-wide transition border-b-2 border-indigo-600 text-white cursor-pointer";
+            document.getElementById(`admin-${tabName}-content`).classList.remove('hidden');
+
+            if (tabName === 'orders') renderOrdersTable();
+            if (tabName === 'products') renderAdminTable();
+        }
+
+        // АНАЛИТИКА СТАТИСТИКАСЫН ЕСЕПТЕУ (Calculate dashboard analytics)
+        function renderStats() {
+            const totalProducts = products.length;
+            const totalOrders = orders.length;
+            
+            // Тек "Аяқталды" статусы бар тапсырыстарды ғана кіріске санау
+            const completedOrders = orders.filter(o => o.status === 'Аяқталды');
+            const totalRevenue = completedOrders.reduce((sum, o) => sum + o.totalPrice, 0);
+
+            document.getElementById('stat-products').innerText = totalProducts;
+            document.getElementById('stat-orders').innerText = totalOrders;
+            document.getElementById('stat-revenue').innerText = `${totalRevenue.toLocaleString()} ₸`;
+        }
+
+        // ТАПСЫРЫСТАРДЫҢ КҮЙІН ӨЗГЕРТУ (Change simulated order status)
+        function updateOrderStatus(orderId, newStatus) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            order.status = newStatus;
+            localStorage.setItem('shop_orders_kz', JSON.stringify(orders));
+            
+            renderOrdersTable();
+            renderStats();
+            showToast(`Тапсырыс күйі "${newStatus}" болып өзгертілді!`);
+        }
+
+        // ТАПСЫРЫСТЫ ӨШІРУ (Delete single order)
+        function deleteOrder(orderId) {
+            if (confirm("Бұл тапсырысты өшіргіңіз келе ме?")) {
+                orders = orders.filter(o => o.id !== orderId);
+                localStorage.setItem('shop_orders_kz', JSON.stringify(orders));
+                renderOrdersTable();
+                renderStats();
+                showToast("Тапсырыс тізімнен жойылды!", 'danger');
+            }
+        }
+
+        // БАРЛЫҚ ТАПСЫРЫСТАРДЫ ӨШІРУ
+        function clearAllOrders() {
+            if (confirm("Барлық тапсырыстар тарихын толығымен өшіргіңіз келе ме? Бұл әрекетті қайтару мүмкін емес.")) {
+                orders = [];
+                localStorage.setItem('shop_orders_kz', JSON.stringify(orders));
+                renderOrdersTable();
+                renderStats();
+                showToast("Барлық тапсырыстар тарихы тазартылды!", 'danger');
+            }
+        }
+
+        // АДМИНКА ТАПСЫРЫСТАР КЕСТЕСІН ШЫҒАРУ (Render Orders Log Table)
+        function renderOrdersTable() {
+            const tableBody = document.getElementById('admin-orders-table');
+            const emptyView = document.getElementById('empty-orders-view');
+
+            if (orders.length === 0) {
+                tableBody.innerHTML = '';
+                emptyView.classList.remove('hidden');
+                return;
+            }
+
+            emptyView.classList.add('hidden');
+            tableBody.innerHTML = orders.map(ord => {
+                // Статус түстері
+                let statusClass = 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20';
+                if (ord.status === 'Дайындалуда') statusClass = 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
+                if (ord.status === 'Жеткізілуде') statusClass = 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20';
+                if (ord.status === 'Аяқталды') statusClass = 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+                if (ord.status === 'Бас тартылды') statusClass = 'bg-red-500/10 text-red-400 border border-red-500/20';
+
+                return `
+                    <tr class="text-xs text-slate-300 hover:bg-slate-900/20 transition">
+                        <td class="py-4 px-4">
+                            <span class="font-bold text-white block">${ord.customerName}</span>
+                            <span class="text-slate-500 text-[10px] block mt-0.5">${ord.customerPhone}</span>
+                            <span class="text-slate-600 text-[9px] block mt-0.5">${ord.date}</span>
+                        </td>
+                        <td class="py-4 px-4 max-w-[150px]">
+                            <span class="font-semibold block">${ord.customerCity}</span>
+                            <span class="text-slate-500 text-[10px] block truncate">${ord.customerAddress}</span>
+                        </td>
+                        <td class="py-4 px-4 max-w-[200px] truncate" title="${ord.items}">
+                            <span class="text-slate-300 font-medium">${ord.items}</span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <span class="font-black text-cyan-400 text-sm">${ord.totalPrice.toLocaleString()} ₸</span>
+                        </td>
+                        <td class="py-4 px-4 text-slate-400 font-medium">
+                            ${ord.paymentMethod}
+                        </td>
+                        <td class="py-4 px-4 text-center">
+                            <select onchange="updateOrderStatus(${ord.id}, this.value)" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold bg-slate-900 border border-slate-800 text-slate-300 cursor-pointer focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                                <option value="Жаңа" ${ord.status === 'Жаңа' ? 'selected' : ''}>Жаңа (Күту)</option>
+                                <option value="Дайындалуда" ${ord.status === 'Дайындалуда' ? 'selected' : ''}>Дайындалуда</option>
+                                <option value="Жеткізілуде" ${ord.status === 'Жеткізілуде' ? 'selected' : ''}>Жеткізілуде</option>
+                                <option value="Аяқталды" ${ord.status === 'Аяқталды' ? 'selected' : ''}>Аяқталды</option>
+                                <option value="Бас тартылды" ${ord.status === 'Бас тартылды' ? 'selected' : ''}>Бас тартылды</option>
+                            </select>
+                        </td>
+                        <td class="py-4 px-4 text-right">
+                            <button onclick="deleteOrder(${ord.id})" class="text-red-500 hover:text-red-400 font-bold text-[10px] bg-red-500/10 px-2 py-1 rounded border border-red-500/20 cursor-pointer transition">
+                                Өшіру
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // АДМИНКА ТАУАРЛАР КЕСТЕСІН ШЫҒАРУ (Render Active Catalog Products Table)
+        function renderAdminTable() {
+            const tableBody = document.getElementById('admin-products-table');
+            tableBody.innerHTML = products.map(prod => `
+                <tr class="text-xs hover:bg-slate-900/10 transition">
+                    <td class="py-3"><img src="${prod.img}" class="w-10 h-10 object-cover rounded-lg border border-slate-800 bg-slate-950"></td>
+                    <td class="py-3 px-4 font-bold text-white">${prod.title}</td>
+                    <td class="py-3 px-4 text-slate-400 font-semibold uppercase tracking-wider text-[10px]">${prod.category}</td>
+                    <td class="py-3 px-4 font-black text-cyan-400">${prod.price.toLocaleString()} ₸</td>
+                    <td class="py-3 text-right space-x-1">
+                        <button onclick="editProduct(${prod.id})" class="text-indigo-400 hover:text-indigo-300 font-bold text-[10px] bg-indigo-500/10 px-2.5 py-1 rounded border border-indigo-500/20 cursor-pointer transition">
+                            Өңдеу
+                        </button>
+                        <button onclick="deleteProduct(${prod.id})" class="text-red-500 hover:text-red-400 font-bold text-[10px] bg-red-500/10 px-2.5 py-1 rounded border border-red-500/20 cursor-pointer transition">
+                            Өшіру
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ТАУАР ҚОСУ НЕМЕСЕ РЕДАКЦИЯЛАУДЫ САҚТАУ (Add or update product form handler)
+        function addProduct(event) {
+            event.preventDefault();
+
+            const idVal = document.getElementById('prod-id').value;
+            const title = document.getElementById('prod-title').value;
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const img = document.getElementById('prod-img').value;
+            const category = document.getElementById('prod-category').value;
+            const desc = document.getElementById('prod-desc').value;
+
+            if (idVal) {
+                // БАР ТАУАРДЫ РЕДАКЦИЯЛАУ (Edit existing)
+                const index = products.findIndex(p => p.id === parseInt(idVal));
+                if (index !== -1) {
+                    products[index] = {
+                        ...products[index],
+                        title,
+                        price,
+                        img,
+                        category,
+                        desc
+                    };
+                    showToast("Тауар сәтті редакцияланды!", 'success');
+                }
+            } else {
+                // ЖАҢА ТАУАР ҚОСУ (Add new)
+                const newProduct = {
+                    id: Date.now(),
+                    title,
+                    price,
+                    img,
+                    category,
+                    desc
+                };
+                products.push(newProduct);
+                showToast("Жаңа тауар сәтті қосылды!", 'success');
+            }
+
+            saveAndRefresh();
+            resetForm();
+        }
+
+        // ТАУАРДЫ РЕДАКЦИЯЛАУҒА ДАЙЫНДАУ (Load product details into edit form)
+        function editProduct(id) {
+            const prod = products.find(p => p.id === id);
+            if (!prod) return;
+
+            // Форма мәліметтерін толтыру
+            document.getElementById('prod-id').value = prod.id;
+            document.getElementById('prod-title').value = prod.title;
+            document.getElementById('prod-price').value = prod.price;
+            document.getElementById('prod-img').value = prod.img;
+            document.getElementById('prod-category').value = prod.category;
+            document.getElementById('prod-desc').value = prod.desc || '';
+
+            // Батырмалар мен тақырыпты өзгерту
+            document.getElementById('form-action-title').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span> Тауарды Өңдеу`;
+            document.getElementById('form-submit-btn').innerText = "Өзгерісті Сақтау";
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+
+            // Форма аймағына жылжу
+            document.getElementById('add-product-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // РЕДАКЦИЯЛАУДЫ БОЛДЫРМАУ
+        function resetForm() {
+            document.getElementById('add-product-form').reset();
+            document.getElementById('prod-id').value = '';
+            
+            document.getElementById('form-action-title').innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-violet-500"></span> Тауар Қосу`;
+            document.getElementById('form-submit-btn').innerText = "Сақтау";
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+        }
+
+        // ТАУАРДЫ ӨШІРУ (Delete catalog product)
+        function deleteProduct(id) {
+            const prod = products.find(p => p.id === id);
+            if (prod && confirm(`"${prod.title}" тауарын ассортимент тізімінен толықтай өшіргіңіз келе ме?`)) {
+                products = products.filter(p => p.id !== id);
+                saveAndRefresh();
+                showToast("Тауар тізімнен өшірілді!", 'danger');
+            }
+        }
+
+        // ДЕРЕКТЕРДІ localStorage-ҚА САҚТАУ ЖӘНЕ БАРЛЫҒЫН ЖАҢАРТУ
+        function saveAndRefresh() {
+            localStorage.setItem('shop_products_kz', JSON.stringify(products));
+            
+            // Дүкен витринасы мен сүзгілерді қайта жүктеу
+            applyFilters();
+            
+            // Админка кестелері мен аналитиканы жаңарту
+            renderAdminTable();
+            renderStats();
+        }
+
+        // АЛҒАШҚЫ ІСКЕ ҚОСУ (Bootstrap initial views)
+        applyFilters();
+        saveCart(); // Себет индикаторын баптау
+    </script>
+</body>
+
+</html>
